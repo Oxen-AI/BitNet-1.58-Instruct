@@ -1,6 +1,7 @@
 
 import argparse
 from bitnet.models.bitnet import BitNetLLM
+from bitnet.prompts.assistant_prompt import AssistantPrompt
 
 def main():
     # parse command line arguments
@@ -13,12 +14,10 @@ def main():
     
     # prompt the model in a loop
     while True:
-        prompt = input("🐂 >")
+        prompt = input("🐂 > ")
+        prompt = AssistantPrompt({"prompt": prompt}).render()
         data = {"prompt": prompt, "answers": []}
         output = model.predict(data)
-        print(f"Model: {output['model']}")
-        print(f"Guess: {output['guess']}")
-        print(f"Correct: {output['is_correct']}")
         print(f"Time: {output['time']}s")
         print()
     
