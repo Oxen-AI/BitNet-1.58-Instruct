@@ -16,6 +16,8 @@ def main():
     parser.add_argument('-o', '--output', required=True, type=str, help='output file to write results to')
     parser.add_argument('-n', '--num_samples', default=-1, type=int, help='how many examples to train on')
     parser.add_argument('-b', '--batch_size', default=1, type=int, help='batch size for training')
+    parser.add_argument('-e', '--epochs', default=2, type=int, help='Number of epochs to train for')
+    parser.add_argument('-l', '--learning_rate', default=2e-4, type=float, help='Learning rate of the model')
     parser.add_argument('--max_seq_len', default=512, type=int, help='max sequence length for model')
     args = parser.parse_args()
 
@@ -44,7 +46,7 @@ def main():
             f.write(json.dumps(data) + "\n")
 
     # kick off the train
-    trainer = BitNetTrainer(args.output, batch_size=args.batch_size)
+    trainer = BitNetTrainer(args.output, batch_size=args.batch_size, epochs=args.epochs)
     trainer.train(model, dataset)
 
 if __name__ == '__main__':

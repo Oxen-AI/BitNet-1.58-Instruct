@@ -5,11 +5,12 @@ from trl import SFTTrainer
 import os
 
 class BitNetTrainer:
-    def __init__(self, output, max_seq_length=512, batch_size=1, learning_rate=2e-4):
+    def __init__(self, output, max_seq_length=512, batch_size=1, epochs=2, learning_rate=2e-4):
         self.output = output
         self.max_seq_length = max_seq_length
         self.batch_size = batch_size
         self.learning_rate = learning_rate
+        self.epochs = epochs
     
     def train(self, model, dataset):
         tokenizer = model.tokenizer
@@ -22,7 +23,7 @@ class BitNetTrainer:
             gradient_accumulation_steps=4,
             warmup_steps=30,
             logging_steps=1,
-            num_train_epochs=2,
+            num_train_epochs=self.epochs,
             save_steps=500,
             save_total_limit=2,
         )
