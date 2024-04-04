@@ -17,9 +17,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Original Implementation of BitNet taken from here: https://huggingface.co/1bitLLM/bitnet_b1_58-large/tree/main
-
 """PyTorch LLaMA model."""
 
 import math
@@ -74,11 +71,9 @@ from torch import nn
 def weight_quant(weight, num_bits=1):
     dtype = weight.dtype
     weight = weight.float()
-    s =  1 / weight.abs().mean().clamp(min=1e-5)
-    result = (weight * s).round().clamp(-1, 1) / s
-    # result = (weight * s).round().clamp(-1, 1) # / s
-    print(result)
-    return result.type(dtype)
+    beta =  1 / weight.abs().mean().clamp(min=1e-5)
+    result = (weight * beta).round().clamp(-1, 1)
+    return result.type(dtype), beta
 
 
 def activation_quant(x, num_bits=8):
@@ -88,7 +83,7 @@ def activation_quant(x, num_bits=8):
     Qp = 2 ** (num_bits - 1) - 1
     s = Qp / x.abs().max(dim=-1, keepdim=True).values.clamp(min=1e-5)
     result = (x * s).round().clamp(Qn, Qp) / s
-    return result.type(dtype)   
+    return result.type(dtype)
 
 
 class BitLinear(nn.Linear):
@@ -107,11 +102,12 @@ class BitLinear(nn.Linear):
         self.input_bits = input_bits
 
     def forward(self, input):
+        w_quant, beta = weight_quant(self.weight, self.weight_bits)
         
         quant_input = input + (activation_quant(input, self.input_bits) - input).detach()
-        quant_weight = self.weight + (weight_quant(self.weight, self.weight_bits) - self.weight).detach()
+        quant_weight = self.weight + (w_quant - self.weight).detach()
 
-        out = nn.functional.linear(quant_input, quant_weight)
+        out = nn.functional.linear(quant_input, quant_weight) / beta
         if not self.bias is None:
             out += self.bias.view(1, -1).expand_as(out)
 
@@ -1333,4 +1329,59 @@ class BitnetForCausalLM(BitnetPreTrainedModel):
             # input_ids based on the past_length.
             elif past_length < input_ids.shape[1]:
                 input_ids = input_ids[:, past_length:]
-            # 3 - Otherwise (past_length >= input_ids.shape[1]), let's assume input_ids only has 
+            # 3 - Otherwise (past_length >= input_ids.shape[1]), let's assume input_ids only has unprocessed tokens.
+
+            # If we are about to go beyond the maximum cache length, we need to crop the input attention mask.
+            if (
+                max_cache_length is not None
+                and attention_mask is not None
+                and cache_length + input_ids.shape[1] > max_cache_length
+            ):
+                attention_mask = attention_mask[:, -max_cache_length:]
+
+        position_ids = kwargs.get("position_ids", None)
+        if attention_mask is not None and position_ids is None:
+            # create position_ids on the fly for batch generation
+            position_ids = attention_mask.long().cumsum(-1) - 1
+            position_ids.masked_fill_(attention_mask == 0, 1)
+            if past_key_values:
+                position_ids = position_ids[:, -input_ids.shape[1] :]
+
+        # if `inputs_embeds` are passed, we only want to use them in the 1st generation step
+        if inputs_embeds is not None and past_key_values is None:
+            model_inputs = {"inputs_embeds": inputs_embeds}
+        else:
+            # The `contiguous()` here is necessary to have a static stride during decoding. torchdynamo otherwise
+            # recompiles graphs as the stride of the inputs is a guard. Ref: https://github.com/huggingface/transformers/pull/29114
+            # TODO: use `next_tokens` directly instead.
+            model_inputs = {"input_ids": input_ids.contiguous()}
+
+        input_length = position_ids.shape[-1] if position_ids is not None else input_ids.shape[-1]
+        if cache_position is None:
+            cache_position = torch.arange(past_length, past_length + input_length, device=input_ids.device)
+        else:
+            cache_position = cache_position[-input_length:]
+
+        if has_static_cache:
+            past_key_values = None
+
+        model_inputs.update(
+            {
+                "position_ids": position_ids,
+                "cache_position": cache_position,
+                "past_key_values": past_key_values,
+                "use_cache": kwargs.get("use_cache"),
+                "attention_mask": attention_mask,
+            }
+        )
+        return model_inputs
+
+    @staticmethod
+    def _reorder_cache(past_key_values, beam_idx):
+        reordered_past = ()
+        for layer_past in past_key_values:
+            reordered_past += (
+                tuple(past_state.index_select(0, beam_idx.to(past_state.device)) for past_state in layer_past),
+            )
+        return reordered_past
+
