@@ -4,3 +4,4 @@ torchvision
 torchaudio
 sentencepiece
 protobuf
+flash_attn

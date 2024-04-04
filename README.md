@@ -2,12 +2,14 @@
 
 Implementation of BitNet-1.58 instruct tuning. This work builds off the pre-trained models released in the [1bitLLM/bitnet_b1_58-large](https://huggingface.co/1bitLLM/bitnet_b1_58-large) project on Hugging Face.
 
+Codename: Bessie the BitNet 🐂
+
 ## Inference
 
-To simply prompt the model in a loop, you can run this script:
+There is a simple script to prompt given a system message. You can give it a base llm or fine tuned llm.
 
 ```bash
-TODO:
+python scripts/prompt.py -m 1bitLLM/bitnet_b1_58-large
 ```
 
 ## Pre-Training
@@ -39,7 +41,7 @@ oxen download ox/BitNet dev.jsonl
 The training was done on an A10 with 24GB of VRAM. We cut off the max seq len to 768 because otherwise it runs out of VRAM on some batches. Would be nice to kick off a train on a larger GPU and larger context length.
 
 ```bash
-python tools/train.py -d -m 1bitLLM/bitnet_b1_58-large -d train.jsonl -o results/bitnet_b1_58-large-instruct --max_seq_len 768
+python tools/train.py -d -m 1bitLLM/bitnet_b1_58-large -d train.jsonl -o results/bitnet_b1_58-large-instruct
 ```
 
 ## Evaluation

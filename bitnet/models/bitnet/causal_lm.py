@@ -59,7 +59,6 @@ logger = logging.get_logger(__name__)
 from transformers.configuration_utils import PretrainedConfig
 from transformers.utils import logging
 
-
 logger = logging.get_logger(__name__)
 
 LLAMA_PRETRAINED_CONFIG_ARCHIVE_MAP = {}
@@ -68,8 +67,8 @@ _CONFIG_FOR_DOC = "BitnetConfig"
 from torch import nn
 
 def orig_weight_quant(weight):
-    s =  1 / weight.abs().mean().clamp(min=1e-5)
-    result = (weight * s).round().clamp(-1, 1) / s
+    scale =  1 / weight.abs().mean().clamp(min=1e-5)
+    result = (weight * scale).round().clamp(-1, 1) / scale
     return result
 
 def weight_quant(weight):
