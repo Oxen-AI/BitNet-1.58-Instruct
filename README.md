@@ -10,9 +10,9 @@ Code Name: Bessie the BitNet 🐂
 
 ## Motivation
 
-We have some internal use cases at [Oxen.ai](https://oxen.ai) for a fast and local LLM. BitNet 1.58 seem like an interesting direction. We will open source our models, data, and code as we go.
-
 This is work done was originally done for the [arXiv dive community](https://oxen.ai/community) and more info on BitNets can be found on our [blog post](https://www.oxen.ai/blog/arxiv-dives-bitnet-1-58).
+
+We also have some internal use cases at [Oxen.ai](https://oxen.ai) for a fast and local LLM. BitNet 1.58 seem like an interesting direction. We will open source our models, data, and code as we go.
 
 ## Inference
 
