@@ -1,6 +1,10 @@
 # BitNet-1.58-Instruct
 
-Implementation of BitNet-1.58 instruct tuning. This work builds off the pre-trained models released in the [1bitLLM/bitnet_b1_58-large](https://huggingface.co/1bitLLM/bitnet_b1_58-large) project on Hugging Face.
+<a href="https://docs.oxen.ai/" style="padding: 2px;">
+    <img src="https://img.shields.io/endpoint?url=https://hub.oxen.ai/api/repos/ox/BitNet/badge">
+</a>
+
+Implementation of BitNet-1.58 instruct tuning. All data and models are versioned and stored on [Oxen.ai](https://Oxen.ai/ox/BitNet) at [ox/BitNet](https://Oxen.ai/ox/BitNet). This work builds off the pre-trained models released in the [1bitLLM/bitnet_b1_58-large](https://huggingface.co/1bitLLM/bitnet_b1_58-large) project on Hugging Face.
 
 Code Name: Bessie the BitNet 🐂
 
@@ -8,19 +12,19 @@ Code Name: Bessie the BitNet 🐂
 
 We have some internal use cases at [Oxen.ai](https://oxen.ai) for a fast and local LLM. BitNet 1.58 seem like an interesting direction. We will open source our models, data, and code as we go.
 
-This is work done was originally done for the [Arxiv Dive community](https://oxen.ai/community) and more info on BitNets can be found on our [blog post](https://www.oxen.ai/blog/arxiv-dives-bitnet-1-58).
+This is work done was originally done for the [arXiv dive community](https://oxen.ai/community) and more info on BitNets can be found on our [blog post](https://www.oxen.ai/blog/arxiv-dives-bitnet-1-58).
 
 ## Inference
 
 There is a simple script to prompt given a system message. You can give it a base llm or fine tuned llm.
 
-### Base Model
+### Run Base Model
 
 ```bash
 python scripts/prompt.py -m 1bitLLM/bitnet_b1_58-large
 ```
 
-### Fine Tuned Model
+### Run Fine-Tuned Model
 
 ```bash
 oxen download ox/BitNet models/bitnet_b1_58-large-instruct-100k
