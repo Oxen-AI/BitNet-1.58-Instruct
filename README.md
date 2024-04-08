@@ -8,6 +8,8 @@ Code Name: Bessie the BitNet 🐂
 
 We have some internal use cases at [Oxen.ai](https://oxen.ai) for a fast and local LLM. BitNet 1.58 seem like an interesting direction. We will open source our models, data, and code as we go.
 
+This is work done was originally done for the [Arxiv Dive community](https://oxen.ai/community) and more info on BitNets can be found on our [blog post](https://www.oxen.ai/blog/arxiv-dives-bitnet-1-58).
+
 ## Inference
 
 There is a simple script to prompt given a system message. You can give it a base llm or fine tuned llm.
