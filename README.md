@@ -1,8 +1,13 @@
 # BitNet-1.58-Instruct
 
+<p align="center" style="display: flex; direction:row; align-items: center">
 <a href="https://docs.oxen.ai/" style="padding: 2px;">
     <img src="https://img.shields.io/endpoint?url=https://hub.oxen.ai/api/repos/ox/BitNet/badge">
+</a>   
+<a target="_blank" href="https://lightning.ai/someshfengde/studios/1-5bitllms-finetuning">
+  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
+</p>
 
 Implementation of BitNet-1.58 instruct tuning. All data and models are versioned and stored on [Oxen.ai](https://Oxen.ai/ox/BitNet) at [ox/BitNet](https://Oxen.ai/ox/BitNet). This work builds off the pre-trained models released in the [1bitLLM/bitnet_b1_58-large](https://huggingface.co/1bitLLM/bitnet_b1_58-large) project on Hugging Face.
 
